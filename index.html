@@ -135,13 +135,16 @@
 
             const normalizedQuery = removeAccents(query.toLowerCase());
             
-            return cepData.filter(item => {
+            const results = cepData.filter(item => {
                 const normalizedLogradouro = removeAccents(item.logradouro.toLowerCase());
                 const normalizedBairro = removeAccents(item.bairro.toLowerCase());
                 
                 return normalizedLogradouro.includes(normalizedQuery) || 
                        normalizedBairro.includes(normalizedQuery);
             });
+            
+            // Limita a 50 resultados por vez
+            return results.slice(0, 50);
         }
 
         // Renderiza os resultados
@@ -164,7 +167,15 @@
             }
 
             noResults.classList.add('hidden');
-            counter.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''} encontrado${results.length !== 1 ? 's' : ''}`;
+            
+            const totalResults = results.length;
+            const maxShown = 50;
+            
+            if (totalResults > maxShown) {
+                counter.textContent = `Mostrando ${maxShown} de ${totalResults} resultados (refine sua busca para ver mais)`;
+            } else {
+                counter.textContent = `${totalResults} resultado${totalResults !== 1 ? 's' : ''} encontrado${totalResults !== 1 ? 's' : ''}`;
+            }
 
             // Renderiza os cards
             results.forEach((item, index) => {
