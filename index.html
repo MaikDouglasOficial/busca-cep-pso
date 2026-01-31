@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Busca CEP - Paraíso</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,6 +21,9 @@
         }
         * {
             box-sizing: border-box;
+        }
+        input, button, textarea, select {
+            font-size: 16px !important;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -56,7 +59,12 @@
             <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <div class="flex-1">
                     <input 
-                        type="text" 
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                        class="w-full max-w-full px-3 sm:px-4 py-3 sm:py-3 text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
+                        style="font-size: 16px;
                         id="searchInput" 
                         placeholder="Digite o nome da rua ou bairro..."
                         class="w-full px-3 sm:px-4 py-3 sm:py-3 text-sm sm:text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
