@@ -45,10 +45,12 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen overflow-x-hidden">
-    <!-- Contador discreto de visitas -->
-    <div class="w-full flex justify-end items-center mt-2 mb-2 pr-4">
-        <span class="text-green-700 text-base font-semibold mr-2">Visitas:</span>
-        <span class="text-green-700 text-base font-mono border border-green-300 bg-green-100 rounded px-3 py-1 shadow-md font-semibold" id="manualVisitCount">1</span>
+    <!-- Contador super discreto -->
+    <div class="w-full flex justify-center items-center mt-2 mb-2">
+        <div class="flex flex-col items-center">
+            <span class="text-xs text-gray-400 font-light">Visitas: <span id="manualVisitCount">1</span></span>
+            <!-- Texto removido para maior discrição -->
+        </div>
     </div>
     <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-8 md:py-12 max-w-5xl">
         <!-- Header -->
@@ -125,6 +127,10 @@
                 }
                 localStorage.setItem(visitKey, count);
                 document.getElementById('manualVisitCount').textContent = count;
+
+                // Salva o valor do contador ao subir para o git
+                // Sempre que for subir uma atualização, copie o valor mostrado aqui
+                document.getElementById('lastVisitCount').textContent = count;
             </script>
         <!-- Firebase SDK -->
         <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
