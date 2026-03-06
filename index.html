@@ -65,7 +65,7 @@
         </div>
 
         <!-- Search Box -->
-        <div class="bg-gradient-to-r from-green-100 via-white to-green-50 rounded-2xl shadow-xl p-4 sm:p-8 mb-6 mobile-optimized border border-green-100">
+        <div class="p-0 mb-6 mobile-optimized">
             <div class="flex flex-col sm:flex-row gap-3">
                 <div class="flex-1">
                     <input 
@@ -76,7 +76,7 @@
                         autocorrect="off"
                         autocapitalize="off"
                         spellcheck="false"
-                        class="w-full max-w-full px-4 py-3 text-base border-2 border-green-200 rounded-xl focus:ring-2 focus:ring-green-400 focus:border-green-400 outline-none transition-all bg-white/80 shadow-inner"
+                        class="w-full max-w-full px-4 py-3 text-base border-2 border-green-100 rounded-xl focus:ring-2 focus:ring-green-400 focus:border-green-400 outline-none transition-all bg-white shadow-none"
                         style="font-size: 16px;"
                     />
                 </div>
@@ -183,9 +183,25 @@
         // FUNÇÕES DE BUSCA E FILTRO
         // ========================================
         
+
         // Remove acentos para facilitar a busca
         function removeAccents(str) {
             return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+
+        // Remove prefixos comuns de logradouros para busca mais flexível
+        function removeStreetPrefix(str) {
+            const prefixes = [
+                'rua', 'avenida', 'av', 'travessa', 'tv', 'alameda', 'al', 'praça', 'praca', 'estrada', 'rodovia', 'r', 'vila', 'loteamento', 'residencial', 'bairro', 'quadra', 'q', 'lote', 'lt', 'conjunto', 'cj', 'setor', 'st', 'parque', 'pq', 'jardim', 'jd', 'campo', 'sitio', 'sítio', 'chácara', 'chacara', 'fazenda', 'fd', 'condominio', 'cond', 'res', 'resid', 'residencial', 'trav', 'via', 'vereda', 'viela', 'passagem', 'psg', 'pátio', 'patio', 'módulo', 'modulo', 'bloco', 'bl', 'ap', 'apartamento', 'andar', 'galeria', 'gal', 'edificio', 'ed', 'predio', 'prédio', 'comercial', 'industrial', 'zona', 'largo', 'lg', 'esplanada', 'esp'
+            ];
+            let s = str.trim().toLowerCase();
+            for (const prefix of prefixes) {
+                if (s.startsWith(prefix + ' ')) {
+                    s = s.slice(prefix.length).trim();
+                    break;
+                }
+            }
+            return s;
         }
 
         // Filtra os dados baseado na busca
@@ -195,15 +211,23 @@
             }
 
             const normalizedQuery = removeAccents(query.toLowerCase());
-            
+            const queryNoPrefix = removeStreetPrefix(normalizedQuery);
+
             const results = cepData.filter(item => {
                 const normalizedLogradouro = removeAccents(item.logradouro.toLowerCase());
+                const logradouroNoPrefix = removeStreetPrefix(normalizedLogradouro);
                 const normalizedBairro = removeAccents(item.bairro.toLowerCase());
-                
-                return normalizedLogradouro.includes(normalizedQuery) || 
-                       normalizedBairro.includes(normalizedQuery);
+
+                // Busca por logradouro completo, logradouro sem prefixo, bairro
+                return (
+                    normalizedLogradouro.includes(normalizedQuery) ||
+                    logradouroNoPrefix.includes(normalizedQuery) ||
+                    normalizedLogradouro.includes(queryNoPrefix) ||
+                    logradouroNoPrefix.includes(queryNoPrefix) ||
+                    normalizedBairro.includes(normalizedQuery)
+                );
             });
-            
+
             // Limita a 50 resultados por vez
             return results.slice(0, 50);
         }
