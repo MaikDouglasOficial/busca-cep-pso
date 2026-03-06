@@ -45,11 +45,12 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen overflow-x-hidden">
+    <!-- Contador discreto de visitas -->
+    <div class="w-full flex justify-end items-center mt-2 mb-2 pr-4">
+        <span class="text-green-700 text-base font-semibold mr-2">Visitas:</span>
+        <span class="text-green-700 text-base font-mono border border-green-300 bg-green-100 rounded px-3 py-1 shadow-md font-semibold" id="manualVisitCount">1</span>
+    </div>
     <div class="container mx-auto px-3 sm:px-4 py-4 sm:py-8 md:py-12 max-w-5xl">
-        <!-- Contador de visitas -->
-        <div id="visitCounter" class="text-center mb-4">
-            <span class="text-gray-700 text-sm">Visitantes: <span id="visitCount">...</span></span>
-        </div>
         <!-- Header -->
         <div class="text-center mb-4 sm:mb-6 md:mb-8">
             <h1 class="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-1 sm:mb-2">
@@ -112,16 +113,54 @@
     </div>
 
     <script src="ceps_paraiso.js"></script>
+            <script>
+                // Contador manual de visitas iniciando em 1
+                const visitKey = 'manualVisitCount';
+                let count = localStorage.getItem(visitKey);
+                if (!count) {
+                    count = 1;
+                } else {
+                    count = parseInt(count);
+                    count++;
+                }
+                localStorage.setItem(visitKey, count);
+                document.getElementById('manualVisitCount').textContent = count;
+            </script>
+        <!-- Firebase SDK -->
+        <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script>
-        // Contador de visitas global usando CountAPI (endpoint alternativo)
-        fetch('https://api.countapi.xyz/update/busca-cep-pso/visitas/?amount=1')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('visitCount').textContent = data.value;
-            })
-            .catch(() => {
-                document.getElementById('visitCount').textContent = 'Erro';
-            });
+        // Contador de visitas global usando Firebase Firestore
+        // Substitua os valores abaixo pelas suas configurações do Firebase
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SUA_AUTH_DOMAIN",
+            projectId: "SUA_PROJECT_ID",
+            storageBucket: "SUA_STORAGE_BUCKET",
+            messagingSenderId: "SUA_MESSAGING_SENDER_ID",
+            appId: "SUA_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const counterDoc = db.collection('contadores').doc('visitas');
+
+        // Incrementa o contador de visitas
+        counterDoc.get().then(doc => {
+            if (doc.exists) {
+                counterDoc.update({ count: firebase.firestore.FieldValue.increment(1) });
+            } else {
+                counterDoc.set({ count: 1 });
+            }
+        });
+
+        // Lê o valor atualizado
+        counterDoc.onSnapshot(doc => {
+            document.getElementById('visitCount').textContent = doc.data().count;
+        }, () => {
+            document.getElementById('visitCount').textContent = 'Erro';
+        });
         // ========================================
         // DADOS - Convertendo do formato do arquivo
         // ========================================
